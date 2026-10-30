@@ -19,6 +19,7 @@
 """
 import argparse
 import datetime as dt
+import html
 import json
 import re
 import sys
@@ -92,10 +93,11 @@ def classify(text):
 
 def clean(s, limit=180):
     s = re.sub(r"<[^>]+>", " ", s or "")
-    s = (s.replace("&#x27;", "'").replace("&#39;", "'").replace("&quot;", '"')
-          .replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
-          .replace("&nbsp;", " "))
-    s = re.sub(r"\s+", " ", s).strip()
+    s = html.unescape(s)
+    s = re.sub(r"https?://\S+", "", s)          # 截斷咗嘅網址只會更亂，乾脆去掉
+    s = re.sub(r"[\u200b-\u200f\ufeff]", "", s)
+    s = re.sub(r"\(\s*\)|\[\s*\]", "", s)      # 去網址後留低嘅空括號
+    s = re.sub(r"\s+", " ", s).strip(" -·|")
     return s[:limit].rstrip() + ("…" if len(s) > limit else "")
 
 
@@ -207,6 +209,13 @@ def source_ph(limit=4):
     for e in feed.findall(f"{NS}entry"):
         title = clean(e.findtext(f"{NS}title") or "", 90)
         tagline = clean(e.findtext(f"{NS}content") or "", 170)
+        noise = re.compile(r"(?:\s*[|·]\s*(?:Discussion|Comments?|Link|Upvote|Product Hunt))+\s*$|\s+(?:Discussion|Comments?)\s*$", re.I)
+        for _ in range(4):
+            cleaned = noise.sub("", tagline).strip()
+            if cleaned == tagline:
+                break
+            tagline = cleaned
+        tagline = re.sub(r"(?:\s*[|·]\s*)+$", "", tagline).strip()
         if not title or not is_ai(f"{title} {tagline}"):
             continue
         link = ""
@@ -256,7 +265,7 @@ def source_news(limit=3):
             "kind": "新聞",
             "category": classify(title),
             "title": title,
-            "note": clean(it.findtext("description") or "", 150) or "AI 落地應用相關報道。",
+            "note": "Google 新聞「AI 應用」搜尋結果，原文報道。",
             "metric": clean(src, 24) or "Google 新聞",
             "url": link,
         })

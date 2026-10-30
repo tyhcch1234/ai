@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>AI · 每日應用庫 — 歷史紀錄</title>
+<meta name="theme-color" content="#06070d" />
+<style>
+  :root{--bg:#06070d;--card:#0f1120;--card2:#151830;--line:#1e2138;--txt:#eef0fa;--dim:#9096b3;--dim2:#666d8c;--violet:#7c5cff;--cyan:#22d3ee}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(760px 420px at 10% -8%,rgba(124,92,255,.2),transparent 62%),
+       radial-gradient(600px 380px at 98% 2%,rgba(34,211,238,.12),transparent 60%),var(--bg);
+    color:var(--txt);min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Noto Sans HK","Microsoft JhengHei",sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:860px;margin:0 auto;padding:32px 16px 72px}
+  a{color:#a9a2ff;text-decoration:none}
+  a:hover{text-decoration:underline}
+  .back{font-size:12.5px;color:var(--dim)}
+  h1{font-size:clamp(24px,6.4vw,34px);margin:14px 0 6px;letter-spacing:-.02em}
+  h1 em{font-style:normal;background:linear-gradient(115deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent;font-family:ui-monospace,monospace}
+  .sub{color:var(--dim);font-size:13.5px;margin:0 0 22px}
+  .day{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:14px;padding:14px 16px;margin-bottom:10px;transition:.18s}
+  .day:hover{border-color:#333a63}
+  .dhead{display:flex;align-items:baseline;gap:9px;margin-bottom:7px}
+  .dhead b{font-size:15px;letter-spacing:.01em}
+  .dhead span{font-size:11.5px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  ul{margin:0;padding-left:18px}
+  li{font-size:13px;color:var(--dim);line-height:1.7}
+  li a{color:#c9c4ff}
+  .empty{color:var(--dim2);font-size:13.5px;padding:40px 0;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← 返去今日</a>
+  <h1><em>AI</em> 歷史紀錄</h1>
+  <p class="sub">每日自動存檔，愈儲愈多。點日期開當日 markdown 全文。</p>
+  <div id="list"><div class="empty">載入中…</div></div>
+</div>
+<script>
+const REPO = 'https://github.com/tyhcch1234/ai/blob/main/archive/';
+const WEEK = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+fetch('../data/apps.json', {cache:'no-store'})
+  .then(r => r.json())
+  .then(d => {
+    const items = d.items || [];
+    const days = {};
+    items.forEach(x => (days[x.date] = days[x.date] || []).push(x));
+    const keys = Object.keys(days).sort().reverse();
+    if(!keys.length){ document.getElementById('list').innerHTML = '<div class="empty">暫時未有紀錄。</div>'; return; }
+    document.getElementById('list').innerHTML = keys.map(date => {
+      const list = days[date].slice().sort((a,b) => (a.rank||0) - (b.rank||0));
+      const [y,m,dd] = date.split('-').map(Number);
+      const wk = WEEK[new Date(y, m-1, dd).getDay()];
+      return `<section class="day">
+        <div class="dhead"><b><a href="${REPO}${esc(date)}.md" target="_blank" rel="noopener">${esc(date)}</a></b>
+          <span style="color:var(--dim)">${wk}</span><span>${list.length} 條</span></div>
+        <ul>${list.slice(0,5).map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a> <span style="color:#5d6484">· ${esc(x.source)}</span></li>`).join('')}</ul>
+      </section>`;
+    }).join('');
+  })
+  .catch(() => document.getElementById('list').innerHTML = '<div class="empty">載入失敗。</div>');
+</script>
+</body>
+</html>

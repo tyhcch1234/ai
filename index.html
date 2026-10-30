@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>AI · 每日 AI 應用庫</title>
+<meta name="description" content="每日自動收錄最新 AI 應用例子：開發者自製工具、可直接試玩的 demo、新上架產品、落地新聞。一日一頁，愈儲愈多。" />
+<meta name="theme-color" content="#06070d" />
+<meta property="og:title" content="AI · 每日 AI 應用庫" />
+<meta property="og:description" content="每日最新嘅 AI 應用例子，附原始連結，一日一頁累積。" />
+<meta property="og:type" content="website" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%237c5cff'/%3E%3Ctext x='16' y='22' font-size='15' font-family='monospace' font-weight='700' text-anchor='middle' fill='white'%3EAI%3C/text%3E%3C/svg%3E" />
+<style>
+  :root{
+    --bg:#06070d; --card:#0f1120; --card2:#151830; --line:#1e2138;
+    --txt:#eef0fa; --dim:#9096b3; --dim2:#666d8c;
+    --violet:#7c5cff; --cyan:#22d3ee; --lime:#a3e635; --gold:#fbbf24; --orange:#ff8a3d;
+    --r:16px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(820px 460px at 8% -8%, rgba(124,92,255,.22), transparent 62%),
+      radial-gradient(680px 420px at 98% 4%, rgba(34,211,238,.14), transparent 60%),
+      radial-gradient(600px 400px at 50% 110%, rgba(163,230,53,.06), transparent 60%),
+      var(--bg);
+    color:var(--txt); min-height:100vh;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang HK","Noto Sans HK","Microsoft JhengHei",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+    background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+                     linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+    background-size:44px 44px;
+    mask-image:radial-gradient(circle at 50% 0%,#000 0%,transparent 78%);
+  }
+  .wrap{position:relative;z-index:1;max-width:960px;margin:0 auto;padding:0 16px 72px}
+
+  /* ── header ── */
+  header{padding:calc(30px + env(safe-area-inset-top)) 0 10px}
+  .brand{display:flex;align-items:center;gap:9px}
+  .pulse{width:9px;height:9px;border-radius:50%;background:var(--lime);box-shadow:0 0 0 0 rgba(163,230,53,.7);animation:p 2.4s infinite}
+  @keyframes p{0%{box-shadow:0 0 0 0 rgba(163,230,53,.55)}70%{box-shadow:0 0 0 9px rgba(163,230,53,0)}100%{box-shadow:0 0 0 0 rgba(163,230,53,0)}}
+  .kicker{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)}
+  h1{font-size:clamp(30px,8.4vw,46px);line-height:1.1;margin:14px 0 10px;letter-spacing:-.03em;font-weight:750}
+  h1 em{
+    font-style:normal;
+    background:linear-gradient(115deg,#a78bfa 0%,#7c5cff 38%,#22d3ee 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  .sub{color:var(--dim);font-size:14.5px;line-height:1.65;margin:0;max-width:560px}
+  .row{display:flex;align-items:center;gap:10px;margin-top:16px;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;align-items:center;gap:7px;background:linear-gradient(135deg,rgba(124,92,255,.22),rgba(34,211,238,.14));
+    border:1px solid rgba(124,92,255,.38);color:#dcd8ff;font-size:13px;font-weight:600;
+    padding:9px 15px;border-radius:999px;cursor:pointer;transition:.18s;font-family:inherit;
+  }
+  .btn:hover{border-color:rgba(124,92,255,.7);transform:translateY(-1px)}
+  .btn-ghost{background:transparent;border-color:var(--line);color:var(--dim)}
+  .btn-ghost:hover{border-color:#3a3f63;color:var(--txt)}
+  .today{font-size:12px;color:var(--dim2);font-variant-numeric:tabular-nums}
+
+  .stats{display:flex;gap:10px;margin:20px 0 14px;flex-wrap:wrap}
+  .stat{flex:1 1 96px;background:linear-gradient(180deg,rgba(21,24,48,.9),rgba(15,17,32,.9));
+    border:1px solid var(--line);border-radius:13px;padding:12px 13px}
+  .stat b{display:block;font-size:21px;line-height:1.25;font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+  .stat span{font-size:10.5px;color:var(--dim2);letter-spacing:.08em}
+
+  /* ── toolbar ── */
+  .toolbar{position:sticky;top:0;z-index:20;padding:10px 0 12px;
+    background:linear-gradient(180deg,rgba(6,7,13,.97) 72%,rgba(6,7,13,0));
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .chips{display:flex;gap:7px;overflow-x:auto;scrollbar-width:none;padding-bottom:3px}
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex:0 0 auto;border:1px solid var(--line);background:rgba(15,17,32,.85);color:var(--dim);
+    padding:7px 13px;border-radius:999px;font-size:12.5px;cursor:pointer;transition:.16s;white-space:nowrap;
+    font-family:inherit;display:inline-flex;align-items:center;gap:6px}
+  .chip i{font-style:normal;font-size:10.5px;color:var(--dim2);font-variant-numeric:tabular-nums}
+  .chip[aria-pressed="true"]{background:var(--txt);color:#07080f;border-color:var(--txt);font-weight:700}
+  .chip[aria-pressed="true"] i{color:rgba(0,0,0,.45)}
+  .chips.cat{margin-top:7px}
+  .chips.cat .chip{font-size:11.5px;padding:5px 11px;border-radius:8px}
+
+  .search{margin-top:9px;position:relative}
+  .search input{width:100%;background:rgba(15,17,32,.92);border:1px solid var(--line);border-radius:12px;
+    padding:11px 14px 11px 38px;color:var(--txt);font-size:15px;outline:none;font-family:inherit}
+  .search input::placeholder{color:var(--dim2)}
+  .search input:focus{border-color:rgba(124,92,255,.55);box-shadow:0 0 0 3px rgba(124,92,255,.1)}
+  .search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:.45}
+
+  /* ── day groups ── */
+  .daygroup{margin-top:26px}
+  .dayhead{display:flex;align-items:baseline;gap:9px;margin-bottom:11px}
+  .dayhead h2{font-size:14.5px;margin:0;letter-spacing:.01em;display:flex;align-items:center;gap:8px}
+  .dayhead .wk{font-size:11.5px;color:var(--dim2);font-weight:400}
+  .dayhead .cnt{font-size:11px;color:var(--dim2);margin-left:auto;font-variant-numeric:tabular-nums}
+  .dayhead::before{content:"";width:3px;height:14px;border-radius:2px;
+    background:linear-gradient(180deg,var(--violet),var(--cyan))}
+  .tagnow{font-size:9.5px;font-weight:700;letter-spacing:.08em;color:#0a0b12;background:var(--lime);
+    border-radius:5px;padding:2px 6px}
+
+  .grid{display:grid;gap:10px}
+  @media(min-width:660px){.grid{grid-template-columns:1fr 1fr}}
+
+  .card{position:relative;background:linear-gradient(180deg,var(--card2),var(--card));
+    border:1px solid var(--line);border-radius:var(--r);padding:14px 14px 12px;
+    display:flex;flex-direction:column;gap:8px;transition:.18s;overflow:hidden}
+  .card::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(400px 120px at 100% 0%,rgba(124,92,255,.09),transparent 70%);opacity:0;transition:.25s}
+  .card:hover{border-color:#333a63;transform:translateY(-2px)}
+  .card:hover::after{opacity:1}
+  .top{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .rank{font-size:10.5px;font-weight:700;color:var(--dim2);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+  .badge{font-size:10px;font-weight:700;letter-spacing:.04em;padding:3px 7px;border-radius:5px;white-space:nowrap}
+  .b-hn{background:rgba(255,138,61,.14);color:#ffa768;border:1px solid rgba(255,138,61,.3)}
+  .b-hf{background:rgba(251,191,36,.14);color:#fcd34d;border:1px solid rgba(251,191,36,.3)}
+  .b-ph{background:rgba(255,97,84,.14);color:#ff8b80;border:1px solid rgba(255,97,84,.3)}
+  .b-news{background:rgba(34,211,238,.13);color:#67e8f9;border:1px solid rgba(34,211,238,.28)}
+  .cat{margin-left:auto;font-size:10.5px;color:#a5aac7;background:rgba(255,255,255,.045);
+    border:1px solid var(--line);border-radius:5px;padding:2px 7px;white-space:nowrap}
+  .title{font-size:15.5px;font-weight:650;line-height:1.38;margin:0;letter-spacing:-.005em}
+  .title a{color:inherit;text-decoration:none;display:inline}
+  .title a:hover{color:#fff;text-decoration:underline;text-underline-offset:3px;text-decoration-color:rgba(124,92,255,.8)}
+  .note{font-size:12.8px;color:var(--dim);line-height:1.55;margin:0;flex:1}
+  .foot{display:flex;align-items:center;gap:10px;border-top:1px dashed var(--line);padding-top:9px;margin-top:2px}
+  .metric{font-size:11px;color:var(--gold);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+  .open{margin-left:auto;font-size:11.5px;color:#a9a2ff;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px}
+  .open:hover{color:#cfc8ff}
+
+  .empty{text-align:center;color:var(--dim2);padding:64px 0;font-size:13.5px;line-height:1.7}
+  .skel{height:112px;border-radius:var(--r);background:linear-gradient(90deg,#12142a 25%,#181b34 50%,#12142a 75%);
+    background-size:200% 100%;animation:sh 1.3s infinite;border:1px solid var(--line)}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  footer{margin-top:44px;border-top:1px solid var(--line);padding-top:16px;color:var(--dim2);font-size:11.5px;line-height:1.8}
+  footer a{color:var(--dim);text-decoration:none;border-bottom:1px dotted #3a3f60}
+  footer a:hover{color:var(--txt)}
+  .srcline{display:flex;flex-wrap:wrap;gap:6px 14px;margin-bottom:8px}
+
+  /* ── overlay ── */
+  .ov{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;
+    background:rgba(3,4,9,.72);backdrop-filter:blur(6px);padding:0}
+  .ov[data-open="1"]{display:flex}
+  @media(min-width:660px){.ov{align-items:center;padding:24px}}
+  .ovbox{width:100%;max-width:520px;background:linear-gradient(180deg,#151830,#0d0f1d);
+    border:1px solid #2a2f4d;border-radius:20px 20px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+    animation:up .24s ease-out}
+  @media(min-width:660px){.ovbox{border-radius:20px;padding-bottom:20px}}
+  @keyframes up{from{transform:translateY(18px);opacity:0}to{transform:none;opacity:1}}
+  .ovbox h3{margin:12px 0 8px;font-size:18px;line-height:1.35}
+  .ovbox p{margin:0 0 14px;font-size:13.5px;color:var(--dim);line-height:1.6}
+  .ovact{display:flex;gap:9px;margin-top:16px}
+  .ovact a,.ovact button{flex:1;text-align:center;text-decoration:none;font-size:13px;font-weight:650;
+    padding:11px 12px;border-radius:11px;border:1px solid var(--line);background:transparent;color:var(--dim);
+    cursor:pointer;font-family:inherit}
+  .ovact a.main{background:linear-gradient(135deg,var(--violet),#5b8cff);border-color:transparent;color:#fff}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><span class="pulse"></span><span class="kicker">Daily AI digest · 每日累積</span></div>
+    <h1><em>AI</em> 每日應用庫</h1>
+    <p class="sub">每日自動收錄最新嘅 AI 應用例子：開發者自己整嘅工具、可以即刻開嚟試嘅 demo、今日新上架嘅產品，同埋落地新聞。全部附原始連結。</p>
+    <div class="row">
+      <button class="btn" id="surprise">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+        隨機睇一個
+      </button>
+      <span class="today" id="todayLabel"></span>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="sTotal">–</b><span>累積例子</span></div>
+      <div class="stat"><b id="sDays">–</b><span>收錄日數</span></div>
+      <div class="stat"><b id="sToday">–</b><span>今日新增</span></div>
+      <div class="stat"><b id="sLatest">–</b><span>最新更新</span></div>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="chips" id="chipsSrc">
+      <button class="chip" data-f="all" aria-pressed="true">全部</button>
+      <button class="chip" data-f="Hacker News" aria-pressed="false">Hacker News</button>
+      <button class="chip" data-f="Hugging Face" aria-pressed="false">Hugging Face</button>
+      <button class="chip" data-f="Product Hunt" aria-pressed="false">Product Hunt</button>
+      <button class="chip" data-f="新聞" aria-pressed="false">新聞</button>
+    </div>
+    <div class="chips cat" id="chipsCat"></div>
+    <div class="search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <input id="q" type="search" placeholder="搵應用、工具、關鍵字…" autocomplete="off" />
+    </div>
+  </div>
+
+  <main id="list"></main>
+
+  <footer>
+    <div class="srcline">
+      <span>資料來源：</span>
+      <a href="https://news.ycombinator.com/" target="_blank" rel="noopener">Hacker News</a>
+      <a href="https://huggingface.co/spaces" target="_blank" rel="noopener">Hugging Face Spaces</a>
+      <a href="https://www.producthunt.com/" target="_blank" rel="noopener">Product Hunt</a>
+      <a href="https://news.google.com/" target="_blank" rel="noopener">Google 新聞</a>
+    </div>
+    所有標題、簡介、數字均為來源原文節錄，本站只做分類同排版，不代寫評價。<br />
+    每日香港時間早上自動更新；歷史紀錄見 <a href="./archive/" id="arcLink">archive</a> · 最新 <span id="fUpdated">–</span>
+  </footer>
+</div>
+
+<div class="ov" id="ov" data-open="0" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+  <div class="ovbox">
+    <div class="top" id="ovTop"></div>
+    <h3 id="ovTitle"></h3>
+    <p id="ovNote"></p>
+    <div class="metric" id="ovMetric"></div>
+    <div class="ovact">
+      <a class="main" id="ovGo" href="#" target="_blank" rel="noopener">開啟原連結</a>
+      <button id="ovClose">閂</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const WEEK = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+const SRC_CLASS = {'Hacker News':'b-hn','Hugging Face':'b-hf','Product Hunt':'b-ph','新聞':'b-news'};
+let DATA = [], src = 'all', cat = 'all', kw = '';
+
+const el = id => document.getElementById(id);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+function hkToday(){
+  const d = new Date(Date.now() + (8*60 + new Date().getTimezoneOffset())*60000);
+  return d.toISOString().slice(0,10);
+}
+
+function fmtDate(s){
+  const [y,m,d] = s.split('-').map(Number);
+  const dt = new Date(y, m-1, d);
+  return { label: `${y}年${m}月${d}日`, wk: WEEK[dt.getDay()] };
+}
+
+function matches(x){
+  if(src !== 'all' && x.source !== src) return false;
+  if(cat !== 'all' && x.category !== cat) return false;
+  if(!kw) return true;
+  return [x.title, x.note, x.category, x.source, x.kind].join(' ').toLowerCase().includes(kw);
+}
+
+function card(x){
+  const hn = x.hn ? ` <a class="open" href="${esc(x.hn)}" target="_blank" rel="noopener">討論</a>` : '';
+  return `<article class="card" data-u="${esc(x.url)}">
+    <div class="top">
+      <span class="rank">#${x.rank}</span>
+      <span class="badge ${SRC_CLASS[x.source] || 'b-news'}">${esc(x.source)}</span>
+      <span class="cat">${esc(x.category)}</span>
+    </div>
+    <h3 class="title"><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.title)}</a></h3>
+    <p class="note">${esc(x.note)}</p>
+    <div class="foot">
+      <span class="metric">${esc(x.metric)}</span>
+      <a class="open" href="${esc(x.url)}" target="_blank" rel="noopener">開啟
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M7 17 17 7M9 7h8v8"/></svg>
+      </a>${hn}
+    </div>
+  </article>`;
+}
+
+function render(){
+  const list = DATA.filter(matches);
+  if(!list.length){
+    el('list').innerHTML = '<div class="empty">搵唔到相符嘅例子。<br />試下換個關鍵字，或者揀「全部」。</div>';
+    return;
+  }
+  const byDate = {};
+  list.forEach(x => (byDate[x.date] = byDate[x.date] || []).push(x));
+  const today = hkToday();
+
+  el('list').innerHTML = Object.keys(byDate).sort().reverse().map(date => {
+    const items = byDate[date].slice().sort((a,b) => (a.rank||0) - (b.rank||0));
+    const {label, wk} = fmtDate(date);
+    return `<section class="daygroup">
+      <div class="dayhead">
+        <h2>${label}<span class="wk">${wk}</span>${date === today ? '<span class="tagnow">今日</span>' : ''}</h2>
+        <span class="cnt">${items.length} 條</span>
+      </div>
+      <div class="grid">${items.map(card).join('')}</div>
+    </section>`;
+  }).join('');
+}
+
+function buildCats(){
+  const counts = {};
+  DATA.forEach(x => counts[x.category] = (counts[x.category] || 0) + 1);
+  const cats = Object.keys(counts).sort((a,b) => counts[b] - counts[a] || a.localeCompare(b, 'zh'));
+  el('chipsCat').innerHTML =
+    `<button class="chip" data-c="all" aria-pressed="true">全部領域</button>` +
+    cats.map(c => `<button class="chip" data-c="${esc(c)}" aria-pressed="false">${esc(c)}<i>${counts[c]}</i></button>`).join('');
+  el('chipsCat').addEventListener('click', e => {
+    const b = e.target.closest('.chip'); if(!b) return;
+    [...el('chipsCat').children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+    cat = b.dataset.c; render();
+  });
+}
+
+function stats(){
+  el('sTotal').textContent = DATA.length;
+  const days = [...new Set(DATA.map(x => x.date))].sort();
+  el('sDays').textContent = days.length;
+  const latest = days[days.length - 1] || '–';
+  el('sToday').textContent = DATA.filter(x => x.date === hkToday()).length;
+  el('sLatest').textContent = latest.slice(5).replace('-', '/');
+  el('fUpdated').textContent = latest;
+  el('todayLabel').textContent = `今日 ${hkToday().replace(/-/g,'/')}（香港時間）`;
+  el('arcLink').href = './archive/';
+}
+
+el('chipsSrc').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if(!b) return;
+  [...el('chipsSrc').children].forEach(c => c.setAttribute('aria-pressed', String(c === b)));
+  src = b.dataset.f; render();
+});
+
+let t;
+el('q').addEventListener('input', e => {
+  clearTimeout(t);
+  t = setTimeout(() => { kw = e.target.value.trim().toLowerCase(); render(); }, 120);
+});
+
+// 隨機抽一個
+el('surprise').addEventListener('click', () => {
+  const pool = DATA.filter(matches);
+  if(!pool.length) return;
+  const x = pool[Math.floor(Math.random() * pool.length)];
+  el('ovTop').innerHTML = `<span class="badge ${SRC_CLASS[x.source] || 'b-news'}">${esc(x.source)}</span>
+    <span class="cat">${esc(x.category)}</span>`;
+  el('ovTitle').textContent = x.title;
+  el('ovNote').textContent = x.note;
+  el('ovMetric').textContent = `${x.date} · ${x.metric}`;
+  el('ovGo').href = x.url;
+  el('ov').dataset.open = '1';
+});
+el('ovClose').addEventListener('click', () => el('ov').dataset.open = '0');
+el('ov').addEventListener('click', e => { if(e.target === el('ov')) el('ov').dataset.open = '0'; });
+document.addEventListener('keydown', e => { if(e.key === 'Escape') el('ov').dataset.open = '0'; });
+
+// 載入
+el('list').innerHTML = '<div class="grid" style="margin-top:26px">' +
+  '<div class="skel"></div><div class="skel"></div><div class="skel"></div><div class="skel"></div></div>';
+
+fetch('./data/apps.json', {cache:'no-store'})
+  .then(r => { if(!r.ok) throw new Error(r.status); return r.json(); })
+  .then(d => {
+    DATA = (d.items || []).map((x,i) => ({...x, rank: x.rank || i+1}));
+    buildCats(); stats(); render();
+  })
+  .catch(err => {
+    el('list').innerHTML = `<div class="empty">載入資料失敗（${esc(err.message)}）。<br />請稍後再試或者重新整理。</div>`;
+  });
+</script>
+</body>
+</html>

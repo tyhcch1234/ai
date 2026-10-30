@@ -1,0 +1,52 @@
+name: Daily AI apps update
+
+# 每日香港時間 07:00（UTC 23:00 前一日）自動抓最新 AI 應用例子
+on:
+  schedule:
+    - cron: "0 23 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "今日已有資料都照重新抓（覆寫當日）"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-ai-apps
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Fetch latest AI app examples
+        run: |
+          if [ "${{ inputs.force }}" = "true" ]; then
+            python3 scripts/fetch_apps.py --force
+          else
+            python3 scripts/fetch_apps.py
+          fi
+
+      - name: Validate data
+        run: python3 scripts/validate.py
+
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- data/ archive/; then
+            echo "今日冇新內容，唔需要 commit"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/ archive/
+          git commit -m "chore: 自動收錄 $(TZ=Asia/Hong_Kong date +%F) AI 應用例子"
+          git push
